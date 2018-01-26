@@ -1,0 +1,22 @@
+@()(implicit request: MessagesRequestHeader)
+
+@main("bart"){
+
+@request.flash.data.map{ case (name, value) =>
+    <div>@name: @value</div>
+}
+
+<div>
+    <ul>
+        <li>
+            <a href="@routes.LogInController.openLogIn">Log in</a>
+        </li>
+        <li>
+            <a href="@routes.UserController.openSignUp">Sign up</a>
+        </li>
+        <li>
+            Go to <a href="@routes.UserController.findAll">@routes.UserController.findAll</a>
+        </li>
+    </ul>
+</div>
+}

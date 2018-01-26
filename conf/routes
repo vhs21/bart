@@ -1,0 +1,19 @@
+# Home page
+GET         /                           controllers.UserController.index
+
+
+# Sign up
+GET         /signup                    controllers.UserController.openSignUp
+
+
+# Log in
+GET         /login                     controllers.LogInController.openLogIn
+POST        /login                     controllers.LogInController.logIn
+
+
+# User
+GET         /users                      controllers.UserController.findAll
+GET         /users/:id                  controllers.UserController.findById(id: Long)
+POST        /users                      controllers.UserController.add
+POST        /users/:id/remove           controllers.UserController.remove(id: Long)
+

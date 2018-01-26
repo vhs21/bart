@@ -1,0 +1,10 @@
+@(user: Option[User])
+<html>
+<head>
+    <title>user from db</title>
+</head>
+<body>
+<div><p>id: <b>@user.get.id</b> username: @user.get.username email:
+    @user.get.email</p></div>
+</body>
+</html>
