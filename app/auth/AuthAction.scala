@@ -1,6 +1,6 @@
 package auth
 
-import com.google.inject.Inject
+import com.google.inject.{Inject, Singleton}
 import models.User
 import play.api.mvc._
 
@@ -9,6 +9,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuthenticatedRequest[A](val user: User, val request: Request[A])
   extends WrappedRequest[A](request)
 
+@Singleton
 class AuthenticatedAction @Inject()
 (parser: BodyParsers.Default)
 (implicit ec: ExecutionContext)
@@ -25,6 +26,7 @@ class AuthenticatedAction @Inject()
 
 }
 
+@Singleton
 class NonAuthenticatedAction @Inject()
 (parser: BodyParsers.Default)
 (implicit ec: ExecutionContext)
