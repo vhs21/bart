@@ -18,6 +18,6 @@ trait UserRepository extends {
 
   def remove(id: Long): Future[Int]
 
-  def exists(logInData: LogInForm.Data): Future[Boolean]
+  def findWithCredentials(logInData: LogInForm.Data): Future[Option[User]]
 
 }

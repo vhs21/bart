@@ -1,5 +1,6 @@
 package forms
 
+import org.mindrot.jbcrypt.BCrypt
 import play.api.data.Form
 import play.api.data.Forms._
 
@@ -17,6 +18,5 @@ object SignUpForm {
                    username: String,
                    email: String,
                    password: String)
-
 
 }
