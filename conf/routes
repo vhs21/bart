@@ -3,13 +3,15 @@ GET         /                           controllers.UserController.index
 
 
 # Sign up
-GET         /signup                    controllers.UserController.openSignUp
+GET         /signup                     controllers.UserController.openSignUp
 
 
 # Log in
-GET         /login                     controllers.LogInController.openLogIn
-POST        /login                     controllers.LogInController.logIn
+GET         /login                      controllers.LogInController.openLogIn
+POST        /login                      controllers.LogInController.logIn
 
+#Log out
+GET         /logout                     controllers.LogInController.logOut
 
 # User
 GET         /users                      controllers.UserController.findAll

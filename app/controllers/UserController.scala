@@ -19,9 +19,7 @@ class UserController @Inject()
   extends AbstractController(cc) with I18nSupport {
 
   def index: Action[AnyContent] = Action.async { implicit request =>
-    Future {
-      Ok(views.html.index())
-    }
+    Future.successful(Ok(views.html.index()))
   }
 
   def findAll: Action[AnyContent] = authenticatedAction.async { implicit request =>
@@ -57,9 +55,7 @@ class UserController @Inject()
   }
 
   def openSignUp: Action[AnyContent] = nonAuthenticatedAction.async { implicit request =>
-    Future {
-      Ok(views.html.signUp(SignUpForm.form))
-    }
+    Future.successful(Ok(views.html.signUp(SignUpForm.form)))
   }
 
 }

@@ -1,6 +1,6 @@
 package controllers
 
-import auth.{Authenticator, NonAuthenticatedAction}
+import auth.{AuthenticatedAction, Authenticator, NonAuthenticatedAction}
 import com.google.inject.Inject
 import forms.LogInForm
 import play.api.i18n.I18nSupport
@@ -11,15 +11,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class LogInController @Inject()
 (cc: ControllerComponents,
+ authenticatedAction: AuthenticatedAction,
  nonAuthenticatedAction: NonAuthenticatedAction,
  userRepository: UserRepository)
 (implicit ec: ExecutionContext)
   extends AbstractController(cc) with I18nSupport {
 
   def openLogIn: Action[AnyContent] = nonAuthenticatedAction.async { implicit request =>
-    Future {
-      Ok(views.html.logIn(LogInForm.form))
-    }
+    Future.successful(Ok(views.html.logIn(LogInForm.form)))
   }
 
   def logIn: Action[AnyContent] = nonAuthenticatedAction.async { implicit request =>
@@ -32,10 +31,19 @@ class LogInController @Inject()
           case Some(user) => Redirect(routes.UserController.index())
             .withSession(Authenticator.USER -> Authenticator.serializeUser(user))
             .flashing("info" -> "Successful log in!")
-          case None => Redirect(routes.LogInController.openLogIn()).flashing("info" -> "User not found!")
+          case None => Redirect(routes.LogInController.openLogIn())
+            .flashing("info" -> "User not found!")
         }
       }
     )
+  }
+
+  def logOut: Action[AnyContent] = authenticatedAction.async { implicit request =>
+    Future {
+      Redirect(routes.UserController.index())
+        .withNewSession
+        .flashing("info" -> "Log out done.")
+    }
   }
 
 }
