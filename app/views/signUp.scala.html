@@ -1,6 +1,6 @@
 @import forms.SignUpForm.Data
 
-@(form: Form[Data])(implicit request: MessagesRequestHeader)
+@(form: Form[Data])(implicit request: RequestHeader, messagesProvider: MessagesProvider)
 
 @main("Bart's sign up"){
 

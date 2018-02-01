@@ -4,6 +4,7 @@ import auth.{AuthenticatedAction, NonAuthenticatedAction}
 import com.google.inject.Inject
 import forms.SignUpForm
 import models.User
+import play.api.i18n.I18nSupport
 import play.api.mvc._
 import repositories.UserRepository
 
@@ -13,9 +14,9 @@ class UserController @Inject()
 (userRepository: UserRepository,
  authenticatedAction: AuthenticatedAction,
  nonAuthenticatedAction: NonAuthenticatedAction,
- cc: MessagesControllerComponents)
+ cc: ControllerComponents)
 (implicit ec: ExecutionContext)
-  extends MessagesAbstractController(cc) {
+  extends AbstractController(cc) with I18nSupport {
 
   def index: Action[AnyContent] = Action.async { implicit request =>
     Future {

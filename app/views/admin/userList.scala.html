@@ -1,4 +1,4 @@
-@(users: Seq[User])(implicit request: MessagesRequestHeader)
+@(users: Seq[User])(implicit request: RequestHeader, messagesProvider: MessagesProvider)
 
 @main("Bart's users") {
 

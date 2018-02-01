@@ -5,22 +5,18 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json._
 
-
 object Authenticator {
 
   val USER = "user"
 
-  implicit val userWrites: Writes[User] {
-    def writes(user: User): JsValue
-  } = new Writes[User] {
-    override def writes(user: User): JsValue = Json.obj(
+  implicit val userWrites: Writes[User] =
+    (user: User) => Json.obj(
       "id" -> user.id,
       "username" -> user.username,
       "email" -> user.email,
       "password" -> user.password,
       "role" -> user.role.id
     )
-  }
 
   implicit val userReads: Reads[User] = (
     (JsPath \ "id").read[Long] and

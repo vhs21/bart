@@ -30,39 +30,42 @@ class UserRepositoryImpl @Inject()(dbapi: DBApi)(implicit ec: ExecutionContext) 
 
   override def findAll: Future[Seq[User]] = Future {
     db.withConnection { implicit connection =>
-      SQL"select id_user, username, email, password, id_role from users".as(user *)
+      SQL"""SELECT id_user, username, email, password, id_role
+           FROM users""".as(user *)
     }
   }(ec)
 
   override def findById(id: Long): Future[Option[User]] = Future {
     db.withConnection { implicit connection =>
-      SQL"select id_user, username, email, password, id_role from users where id_user = $id"
-        .as(user.singleOpt)
+      SQL"""SELECT id_user, username, email, password, id_role
+            FROM users
+            WHERE id_user = $id""".as(user.singleOpt)
     }
   }(ec)
 
   override def add(user: User): Future[Int] = Future {
     db.withConnection { implicit connection =>
-      println(user)
-      SQL"""insert into users(username, email, password, id_role) values(
+      SQL"""INSERT INTO users(username, email, password, id_role) VALUES(
         ${user.username},
         ${user.email},
         ${BCrypt.hashpw(user.password, BCrypt.gensalt())},
-        ${user.role.id})"""
-        .executeUpdate()
+        ${user.role.id})""".executeUpdate()
     }
   }(ec)
 
   override def remove(id: Long): Future[Int] = Future {
     db.withConnection { implicit connection =>
-      SQL"delete from users where id_user = $id".executeUpdate()
+      SQL"""DELETE
+            FROM users
+            WHERE id_user = $id""".executeUpdate()
     }
   }(ec)
 
   override def findWithCredentials(logInData: LogInForm.Data): Future[Option[User]] = Future {
     db.withConnection { implicit connection =>
-      SQL"""select id_user, username, email, password, id_role from users
-           where username = ${logInData.username}"""
+      SQL"""SELECT id_user, username, email, password, id_role
+            FROM users
+            WHERE username = ${logInData.username}"""
         .as(user.singleOpt).filter(curUser => BCrypt.checkpw(logInData.password, curUser.password))
     }
   }(ec)
