@@ -1,9 +1,9 @@
 package controllers
 
-import auth.{AuthenticatedAction, NonAuthenticatedAction}
+import auth.{AuthenticatedAction, NonAuthenticatedAction, AuthenticatedRoleAction}
 import com.google.inject.Inject
 import forms.SignUpForm
-import models.User
+import models.{Role, User}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import repositories.UserRepository
@@ -11,12 +11,9 @@ import repositories.UserRepository
 import scala.concurrent.{ExecutionContext, Future}
 
 class UserController @Inject()
-(userRepository: UserRepository,
- authenticatedAction: AuthenticatedAction,
- nonAuthenticatedAction: NonAuthenticatedAction,
- cc: ControllerComponents)
-(implicit ec: ExecutionContext)
-  extends AbstractController(cc) with I18nSupport {
+(userRepository: UserRepository, authenticatedAction: AuthenticatedAction,
+ nonAuthenticatedAction: NonAuthenticatedAction, authenticatedRoleAction: AuthenticatedRoleAction, cc: ControllerComponents)
+(implicit ec: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
   def index: Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Ok(views.html.index()))
@@ -25,6 +22,12 @@ class UserController @Inject()
   def findAll: Action[AnyContent] = authenticatedAction.async { implicit request =>
     userRepository.findAll map { users =>
       Ok(views.html.userList(users))
+    }
+  }
+
+  def findAllManagement: Action[AnyContent] = authenticatedRoleAction(Role.ADMIN).async { implicit request =>
+    userRepository.findAll map { users =>
+      Ok(views.html.admin.userList(users))
     }
   }
 

@@ -1,6 +1,6 @@
 package controllers
 
-import auth.{AuthenticatedAction, Authenticator, NonAuthenticatedAction}
+import auth._
 import com.google.inject.Inject
 import forms.LogInForm
 import play.api.i18n.I18nSupport
@@ -10,12 +10,9 @@ import repositories.UserRepository
 import scala.concurrent.{ExecutionContext, Future}
 
 class LogInController @Inject()
-(cc: ControllerComponents,
- authenticatedAction: AuthenticatedAction,
- nonAuthenticatedAction: NonAuthenticatedAction,
- userRepository: UserRepository)
-(implicit ec: ExecutionContext)
-  extends AbstractController(cc) with I18nSupport {
+(userRepository: UserRepository, authenticatedAction: AuthenticatedAction,
+ nonAuthenticatedAction: NonAuthenticatedAction, cc: ControllerComponents)
+(implicit ec: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
   def openLogIn: Action[AnyContent] = nonAuthenticatedAction.async { implicit request =>
     Future.successful(Ok(views.html.logIn(LogInForm.form)))

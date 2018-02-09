@@ -19,3 +19,4 @@ GET         /users/:id                  controllers.UserController.findById(id: 
 POST        /users                      controllers.UserController.add
 POST        /users/:id/remove           controllers.UserController.remove(id: Long)
 
+GET         /management/users           controllers.UserController.findAllManagement
