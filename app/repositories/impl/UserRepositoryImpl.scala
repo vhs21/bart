@@ -6,6 +6,7 @@ import anorm.SqlParser._
 import anorm._
 import com.google.inject.{Inject, Singleton}
 import forms.LogInForm
+import models.Role.Role
 import org.mindrot.jbcrypt.BCrypt
 import play.api.db.DBApi
 
@@ -31,7 +32,7 @@ class UserRepositoryImpl @Inject()(dbapi: DBApi)(implicit ec: ExecutionContext) 
   override def findAll: Future[Seq[User]] = Future {
     db.withConnection { implicit connection =>
       SQL"""SELECT id_user, username, email, password, id_role
-           FROM users""".as(user *)
+            FROM users""".as(user *)
     }
   }(ec)
 
@@ -46,10 +47,10 @@ class UserRepositoryImpl @Inject()(dbapi: DBApi)(implicit ec: ExecutionContext) 
   override def add(user: User): Future[Int] = Future {
     db.withConnection { implicit connection =>
       SQL"""INSERT INTO users(username, email, password, id_role) VALUES(
-        ${user.username},
-        ${user.email},
-        ${BCrypt.hashpw(user.password, BCrypt.gensalt())},
-        ${user.role.id})""".executeUpdate()
+            ${user.username},
+            ${user.email},
+            ${BCrypt.hashpw(user.password, BCrypt.gensalt())},
+            ${user.role.id})""".executeUpdate()
     }
   }(ec)
 
@@ -66,7 +67,17 @@ class UserRepositoryImpl @Inject()(dbapi: DBApi)(implicit ec: ExecutionContext) 
       SQL"""SELECT id_user, username, email, password, id_role
             FROM users
             WHERE username = ${logInData.username}"""
-        .as(user.singleOpt).filter(curUser => BCrypt.checkpw(logInData.password, curUser.password))
+        .as(user.singleOpt).filter(curUser =>
+        BCrypt.checkpw(logInData.password, curUser.password))
+    }
+  }(ec)
+
+  override def changeRole(userId: Long, newRole: Role): Future[Boolean] = Future {
+    db.withConnection { implicit connection =>
+      SQL"""UPDATE users
+            SET id_role = ${newRole.id}
+            WHERE id_user = $userId"""
+        .execute()
     }
   }(ec)
 

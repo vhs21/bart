@@ -18,5 +18,6 @@ GET         /users                      controllers.UserController.findAll
 GET         /users/:id                  controllers.UserController.findById(id: Long)
 POST        /users                      controllers.UserController.add
 POST        /users/:id/remove           controllers.UserController.remove(id: Long)
+POST        /users/:id/:roleId          controllers.UserController.changeRole(id: Long, roleId: Int)
 
 GET         /management/users           controllers.UserController.findAllManagement

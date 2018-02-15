@@ -4,6 +4,10 @@
 
 <h3>Users</h3>
 
+@request.flash.data.map{ case (name, value) =>
+    <div>@name: @value</div>
+}
+
 <table>
     <thead>
     <tr>
@@ -11,6 +15,7 @@
         <th>username</th>
         <th>email</th>
         <th>role</th>
+        <th>change role</th>
         <th>delete</th>
     </tr>
     </thead>
@@ -21,6 +26,12 @@
         <td>@user.username</td>
         <td>@user.email</td>
         <td>@user.role</td>
+        <td>
+            @helper.form(routes.UserController.changeRole(user.id.get, user.role.id)){
+            @helper.CSRF.formField
+            <button>--</button>
+            }
+        </td>
         <td>
             @helper.form(routes.UserController.remove(user.id.get)){
             @helper.CSRF.formField

@@ -1,8 +1,9 @@
 package controllers
 
-import auth.{AuthenticatedAction, NonAuthenticatedAction, AuthenticatedRoleAction}
+import auth.{AuthenticatedAction, AuthenticatedRoleAction, NonAuthenticatedAction}
 import com.google.inject.Inject
 import forms.SignUpForm
+import models.Role.Role
 import models.{Role, User}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
@@ -12,7 +13,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class UserController @Inject()
 (userRepository: UserRepository, authenticatedAction: AuthenticatedAction,
- nonAuthenticatedAction: NonAuthenticatedAction, authenticatedRoleAction: AuthenticatedRoleAction, cc: ControllerComponents)
+ nonAuthenticatedAction: NonAuthenticatedAction, authenticatedRoleAction: AuthenticatedRoleAction,
+ cc: ControllerComponents)
 (implicit ec: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
   def index: Action[AnyContent] = Action.async { implicit request =>
@@ -59,6 +61,20 @@ class UserController @Inject()
 
   def openSignUp: Action[AnyContent] = nonAuthenticatedAction.async { implicit request =>
     Future.successful(Ok(views.html.signUp(SignUpForm.form)))
+  }
+
+  def changeRole(id: Long, roleId: Int): Action[AnyContent] = authenticatedRoleAction(Role.ADMIN).async { implicit request =>
+    Role(roleId) match {
+      case Role.USER => changeRole(id, Role.MANAGER)
+      case Role.MANAGER => changeRole(id, Role.USER)
+      case _ => Future.successful(Redirect(routes.UserController.findAllManagement()).flashing("info" -> "Can't change role!"))
+    }
+  }
+
+  private def changeRole(userId: Long, newRole: Role) = {
+    userRepository.changeRole(userId, newRole) map { _ =>
+      Redirect(routes.UserController.findAllManagement()).flashing("info" -> "Role changed!")
+    }
   }
 
 }
