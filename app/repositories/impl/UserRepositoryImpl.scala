@@ -1,14 +1,12 @@
 package repositories.impl
 
-import models.{Role, User}
-import repositories.UserRepository
 import anorm.SqlParser._
 import anorm._
 import com.google.inject.{Inject, Singleton}
-import forms.LogInForm
-import models.Role.Role
+import models.{Role, User}
 import org.mindrot.jbcrypt.BCrypt
 import play.api.db.DBApi
+import repositories.UserRepository
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
@@ -18,43 +16,43 @@ class UserRepositoryImpl @Inject()(dbapi: DBApi)(implicit ec: ExecutionContext) 
 
   private val db = dbapi.database("default")
 
-  private val user = {
+  private val userMapper = {
     get[Option[Long]]("users.id_user") ~
       get[String]("users.username") ~
       get[String]("users.email") ~
-      get[String]("users.password") ~
+      get[Option[String]]("users.password") ~
       get[Int]("users.id_role") map {
-      case id ~ username ~ email ~ password ~ role =>
-        User(id, username, email, password, Role(role))
+      case id ~ username ~ email ~ password ~ roleId =>
+        User(id, username, email, password, Option(Role(roleId)))
     }
   }
 
-  override def findAll: Future[Seq[User]] = Future {
+  override def selectAll: Future[Seq[User]] = Future {
     db.withConnection { implicit connection =>
       SQL"""SELECT id_user, username, email, password, id_role
-            FROM users""".as(user *)
+            FROM users""".as(userMapper *)
     }
   }(ec)
 
-  override def findById(id: Long): Future[Option[User]] = Future {
+  override def select(id: Long): Future[Option[User]] = Future {
     db.withConnection { implicit connection =>
       SQL"""SELECT id_user, username, email, password, id_role
             FROM users
-            WHERE id_user = $id""".as(user.singleOpt)
+            WHERE id_user = $id""".as(userMapper.singleOpt)
     }
   }(ec)
 
-  override def add(user: User): Future[Int] = Future {
+  override def insert(user: User): Future[Option[Long]] = Future {
     db.withConnection { implicit connection =>
       SQL"""INSERT INTO users(username, email, password, id_role) VALUES(
             ${user.username},
             ${user.email},
-            ${BCrypt.hashpw(user.password, BCrypt.gensalt())},
-            ${user.role.id})""".executeUpdate()
+            ${BCrypt.hashpw(user.password.get, BCrypt.gensalt())},
+            ${user.role.getOrElse(Role.USER).id})""".executeInsert()
     }
   }(ec)
 
-  override def remove(id: Long): Future[Int] = Future {
+  override def delete(id: Long): Future[Int] = Future {
     db.withConnection { implicit connection =>
       SQL"""DELETE
             FROM users
@@ -62,22 +60,21 @@ class UserRepositoryImpl @Inject()(dbapi: DBApi)(implicit ec: ExecutionContext) 
     }
   }(ec)
 
-  override def findWithCredentials(logInData: LogInForm.Data): Future[Option[User]] = Future {
+  override def update(id: Long, user: User): Future[Int] = Future {
     db.withConnection { implicit connection =>
-      SQL"""SELECT id_user, username, email, password, id_role
-            FROM users
-            WHERE username = ${logInData.username}"""
-        .as(user.singleOpt).filter(curUser =>
-        BCrypt.checkpw(logInData.password, curUser.password))
+      SQL"""UPDATE users
+            SET username = ${user.username},
+                email = ${user.email}
+            WHERE id_user = $id""".executeUpdate()
     }
   }(ec)
 
-  override def changeRole(userId: Long, newRole: Role): Future[Boolean] = Future {
+  override def authenticate(username: String, password: String): Future[Option[User]] = Future {
     db.withConnection { implicit connection =>
-      SQL"""UPDATE users
-            SET id_role = ${newRole.id}
-            WHERE id_user = $userId"""
-        .execute()
+      SQL"""SELECT id_user, username, email, password, id_role
+            FROM users
+            WHERE username = $username""".as(userMapper.singleOpt)
+        .filter(user => BCrypt.checkpw(password, user.password.get))
     }
   }(ec)
 

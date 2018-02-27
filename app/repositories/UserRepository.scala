@@ -1,8 +1,6 @@
 package repositories
 
 import com.google.inject.ImplementedBy
-import forms.LogInForm
-import models.Role.Role
 import models.User
 import repositories.impl.UserRepositoryImpl
 
@@ -11,16 +9,16 @@ import scala.concurrent.Future
 @ImplementedBy(classOf[UserRepositoryImpl])
 trait UserRepository {
 
-  def findAll: Future[Seq[User]]
+  def selectAll: Future[Seq[User]]
 
-  def findById(id: Long): Future[Option[User]]
+  def select(id: Long): Future[Option[User]]
 
-  def add(user: User): Future[Int]
+  def insert(user: User): Future[Option[Long]]
 
-  def remove(id: Long): Future[Int]
+  def delete(id: Long): Future[Int]
 
-  def findWithCredentials(logInData: LogInForm.Data): Future[Option[User]]
+  def update(id: Long, user: User): Future[Int]
 
-  def changeRole(userId: Long, newRole: Role): Future[Boolean]
+  def authenticate(username: String, password:String): Future[Option[User]]
 
 }
