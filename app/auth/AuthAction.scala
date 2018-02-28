@@ -22,21 +22,21 @@ class AuthenticatedAction @Inject()
           case Some(user) => Right(new AuthenticatedRequest(user, request))
           case None => Left(Results.Forbidden)
         }
-      case None => Left(Results.Forbidden)
+      case None => Left(Results.Unauthorized)
     }
   }
 
-  private def checkRole(role: Role)(implicit ec: ExecutionContext): ActionFilter[AuthenticatedRequest]
+  private def checkRole(roles: Seq[Role])(implicit ec: ExecutionContext): ActionFilter[AuthenticatedRequest]
   = new ActionFilter[AuthenticatedRequest] {
     override protected def executionContext: ExecutionContext = ec
 
     override protected def filter[A](request: AuthenticatedRequest[A]): Future[Option[Result]] = Future.successful {
-      if (request.user.role.get == role) None
+      if (roles.contains(request.user.role.get)) None
       else Some(Results.Forbidden)
     }
   }
 
-  def apply(role: Role): ActionBuilder[AuthenticatedRequest, AnyContent] = this andThen checkRole(role)
+  def apply(roles: Role*): ActionBuilder[AuthenticatedRequest, AnyContent] = this andThen checkRole(roles)
 }
 
 @Singleton
@@ -45,7 +45,7 @@ class NonAuthenticatedAction @Inject()
 (implicit val executionContext: ExecutionContext)
   extends ActionBuilder[Request, AnyContent] with ActionFilter[Request] {
   override protected def filter[A](request: Request[A]): Future[Option[Result]] = Future {
-    request.session.get(jwtAuthenticator.HEADER) match {
+    request.headers.get(jwtAuthenticator.HEADER) match {
       case Some(_) => Some(Results.Forbidden)
       case None => None
     }

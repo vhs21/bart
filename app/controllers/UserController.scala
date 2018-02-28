@@ -17,20 +17,20 @@ class UserController @Inject()(
                               (implicit ec: ExecutionContext)
   extends AbstractController(cc) {
 
-  def selectAll = Action.async { implicit request =>
+  def selectAll = authenticatedAction(Role.ADMIN).async { implicit request =>
     userRepository.selectAll map { users =>
       Ok(Json.toJson(users))
     }
   }
 
-  def select(id: Long) = Action.async { implicit request =>
+  def select(id: Long) = authenticatedAction.async { implicit request =>
     userRepository.select(id) map {
       case Some(user) => Ok(Json.toJson(user))
       case None => NotFound
     }
   }
 
-  def insert = Action(parse.json).async { implicit request =>
+  def insert = nonAuthenticatedAction(parse.json).async { implicit request =>
     request.body.validate[User].fold(
       invalid => Future.successful(BadRequest),
       user => userRepository.insert(user) map (_ => Ok)
@@ -44,7 +44,7 @@ class UserController @Inject()(
     }
   }
 
-  def update(id: Long) = Action(parse.json).async { implicit request =>
+  def update(id: Long) = authenticatedAction(parse.json).async { implicit request =>
     request.body.validate[User].fold(
       invalid => Future.successful(BadRequest),
       user => userRepository.update(id, user) map { updated =>
