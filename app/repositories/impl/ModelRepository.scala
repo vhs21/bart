@@ -1,13 +1,12 @@
 package repositories.impl
 
 import anorm._
-import models.Model
 import play.api.db.{DBApi, Database}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
 
-abstract class ModelRepository[A <: Model](val dbapi: DBApi)(implicit ec: ExecutionContext) {
+abstract class ModelRepository[A](val dbapi: DBApi)(implicit ec: ExecutionContext) {
 
   protected val db: Database = dbapi.database("default")
 

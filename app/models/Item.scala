@@ -12,7 +12,6 @@ case class Item(
                  description: Option[String],
                  idUser: Long,
                  registrationDate: Option[LocalDateTime])
-  extends Model
 
 object Item {
 

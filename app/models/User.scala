@@ -11,7 +11,6 @@ case class User(
                  email: String,
                  password: Option[String],
                  role: Option[Role] = Option(Role.USER))
-  extends Model
 
 object User {
 

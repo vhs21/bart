@@ -1,10 +1,8 @@
 package repositories
 
-import models.Model
-
 import scala.concurrent.Future
 
-trait Repository[A <: Model] {
+trait Repository[A] {
 
   def selectAll: Future[Seq[A]]
 
