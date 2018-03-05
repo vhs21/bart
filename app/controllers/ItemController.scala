@@ -2,7 +2,7 @@ package controllers
 
 import auth.AuthenticatedAction
 import com.google.inject.Inject
-import models.Item
+import models.{Item, Role}
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
 import repositories.ItemRepository
@@ -52,5 +52,13 @@ class ItemController @Inject()(
       }
     )
   }
+
+  def updateStatus(id: Long, idStatus: Int) = authenticatedAction(Role.MANAGER, Role.ADMIN)
+    .async { implicit request =>
+      itemRepository.updateStatus(id, idStatus) map { updated =>
+        if (updated > 0) Ok
+        else NotFound
+      }
+    }
 
 }

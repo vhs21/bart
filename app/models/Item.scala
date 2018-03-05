@@ -4,6 +4,7 @@ import java.time.LocalDateTime
 
 import anorm.SqlParser.get
 import anorm.{RowParser, ~}
+import models.ItemStatus.ItemStatus
 import play.api.libs.json._
 
 case class Item(
@@ -11,7 +12,8 @@ case class Item(
                  name: String,
                  description: Option[String],
                  idUser: Long,
-                 registrationDate: Option[LocalDateTime])
+                 registrationDate: Option[LocalDateTime],
+                 itemStatus: ItemStatus)
 
 object Item {
 
@@ -20,9 +22,10 @@ object Item {
       get[String]("items.name") ~
       get[Option[String]]("items.description") ~
       get[Long]("items.id_user") ~
-      get[Option[LocalDateTime]]("items.registration_date") map {
-      case id ~ name ~ description ~ user ~ registrationDate =>
-        Item(id, name, description, user, registrationDate)
+      get[Option[LocalDateTime]]("items.registration_date") ~
+      get[Int]("items.id_item_status") map {
+      case id ~ name ~ description ~ user ~ registrationDate ~ idItemStatus =>
+        Item(id, name, description, user, registrationDate, ItemStatus(idItemStatus))
     }
   }
 
@@ -33,7 +36,8 @@ object Item {
         name = (json \ "name").as[String],
         description = (json \ "description").asOpt[String],
         idUser = (json \ "idUser").as[Long],
-        registrationDate = (json \ "registrationDate").asOpt[LocalDateTime])
+        registrationDate = (json \ "registrationDate").asOpt[LocalDateTime],
+        itemStatus = (json \ "itemStatus").as[ItemStatus])
     )
 
     override def writes(item: Item): JsValue = Json.obj(
@@ -41,7 +45,8 @@ object Item {
       "name" -> item.name,
       "description" -> item.description,
       "idUser" -> item.idUser,
-      "registrationDate" -> item.registrationDate
+      "registrationDate" -> item.registrationDate,
+      "itemStatus" -> item.itemStatus
     )
   }
 

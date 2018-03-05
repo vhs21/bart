@@ -14,3 +14,5 @@ GET         /api/items/:id              controllers.ItemController.select(id: Lo
 POST        /api/items                  controllers.ItemController.insert
 DELETE      /api/items/:id              controllers.ItemController.delete(id: Long)
 PUT         /api/items/:id              controllers.ItemController.update(id: Long)
+
+PUT         /api/items/:id/:idStatus    controllers.ItemController.updateStatus(id: Long, idStatus: Int)
