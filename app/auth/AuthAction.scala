@@ -2,7 +2,7 @@ package auth
 
 import com.google.inject.{Inject, Singleton}
 import models.Role.Role
-import models.User
+import models.{Role, User}
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,7 +31,7 @@ class AuthenticatedAction @Inject()
     override protected def executionContext: ExecutionContext = ec
 
     override protected def filter[A](request: AuthenticatedRequest[A]): Future[Option[Result]] = Future.successful {
-      if (roles.contains(request.user.role.get)) None
+      if (roles.contains(request.user.role.getOrElse(Role.USER))) None
       else Some(Results.Forbidden)
     }
   }
