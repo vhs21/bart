@@ -13,7 +13,7 @@ class ItemController @Inject()(
                                 val itemRepository: ItemRepository,
                                 val authenticatedAction: AuthenticatedAction,
                                 val cc: ControllerComponents)
-                              (implicit ec: ExecutionContext)
+                              (implicit val ec: ExecutionContext)
   extends AbstractController(cc) {
 
   def selectAll: Action[AnyContent] = Action.async { implicit request =>

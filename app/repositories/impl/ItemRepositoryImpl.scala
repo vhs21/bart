@@ -8,7 +8,7 @@ import repositories.ItemRepository
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ItemRepositoryImpl @Inject()(dbapi: DBApi)(implicit ec: ExecutionContext)
+class ItemRepositoryImpl @Inject()(dbapi: DBApi)(implicit val ec: ExecutionContext)
   extends ModelRepository[Item](dbapi) with ItemRepository {
 
   override def selectAll: Future[Seq[Item]] = selectAll(
@@ -43,4 +43,5 @@ class ItemRepositoryImpl @Inject()(dbapi: DBApi)(implicit ec: ExecutionContext)
             WHERE id_item = $id""".executeUpdate()
     }
   }
+
 }

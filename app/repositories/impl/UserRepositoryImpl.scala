@@ -11,7 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
 
 @Singleton
-class UserRepositoryImpl @Inject()(dbapi: DBApi)(implicit ec: ExecutionContext)
+class UserRepositoryImpl @Inject()(dbapi: DBApi)(implicit val ec: ExecutionContext)
   extends ModelRepository[User](dbapi) with UserRepository {
 
   override def selectAll: Future[Seq[User]] = selectAll(
@@ -48,6 +48,6 @@ class UserRepositoryImpl @Inject()(dbapi: DBApi)(implicit ec: ExecutionContext)
             WHERE username = $username""".as(User.parser.singleOpt)
         .filter(user => BCrypt.checkpw(password, user.password.get))
     }
-  }(ec)
+  }
 
 }

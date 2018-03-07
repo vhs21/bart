@@ -14,7 +14,7 @@ class UserController @Inject()(
                                 val authenticatedAction: AuthenticatedAction,
                                 val nonAuthenticatedAction: NonAuthenticatedAction,
                                 val cc: ControllerComponents)
-                              (implicit ec: ExecutionContext)
+                              (implicit val ec: ExecutionContext)
   extends AbstractController(cc) {
 
   def selectAll: Action[AnyContent] = authenticatedAction(Role.ADMIN).async { implicit request =>

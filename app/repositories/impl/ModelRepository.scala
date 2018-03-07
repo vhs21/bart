@@ -12,22 +12,22 @@ abstract class ModelRepository[A](val dbapi: DBApi)(implicit ec: ExecutionContex
 
   def selectAll(query: SimpleSql[Row], parser: RowParser[A]): Future[Seq[A]] = Future {
     db.withConnection { implicit connection => query.as(parser *) }
-  }(ec)
+  }
 
   def select(id: Long, query: SimpleSql[Row], parser: RowParser[A]): Future[Option[A]] = Future {
     db.withConnection { implicit connection => query.as(parser.singleOpt) }
-  }(ec)
+  }
 
   def insert(element: A, query: SimpleSql[Row]): Future[Option[Long]] = Future {
     db.withConnection { implicit connection => query.executeInsert() }
-  }(ec)
+  }
 
   def delete(id: Long, query: SimpleSql[Row]): Future[Int] = Future {
     db.withConnection { implicit connection => query.executeUpdate() }
-  }(ec)
+  }
 
   def update(id: Long, element: A, query: SimpleSql[Row]): Future[Int] = Future {
     db.withConnection { implicit connection => query.executeUpdate() }
-  }(ec)
+  }
 
 }
