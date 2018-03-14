@@ -8,7 +8,7 @@ case class Bid(
                 id: Option[Long],
                 idGoalItem: Long,
                 idOfferItem: Long,
-                isAccepted: Boolean = false)
+                isAccepted: Boolean)
 
 object Bid {
 
@@ -35,7 +35,7 @@ object Bid {
         id = (json \ "id").asOpt[Long],
         idGoalItem = (json \ "idGoalItem").as[Long],
         idOfferItem = (json \ "idOfferItem").as[Long],
-        isAccepted = (json \ "isAccepted").as[Boolean]
+        isAccepted = (json \ "isAccepted").asOpt[Boolean].getOrElse(false)
       )
     )
   }

@@ -13,7 +13,7 @@ case class Item(
                  description: Option[String],
                  registrationDate: Option[LocalDateTime],
                  idUser: Long,
-                 itemStatus: ItemStatus)
+                 itemStatus: Option[ItemStatus])
 
 object Item {
 
@@ -25,7 +25,7 @@ object Item {
       get[Long]("items.id_user") ~
       get[Int]("items.id_item_status") map {
       case id ~ name ~ description ~ registrationDate ~ user ~ idItemStatus =>
-        Item(id, name, description, registrationDate, user, ItemStatus(idItemStatus))
+        Item(id, name, description, registrationDate, user, Option(ItemStatus(idItemStatus)))
     }
   }
 
@@ -37,7 +37,7 @@ object Item {
         description = (json \ "description").asOpt[String],
         registrationDate = (json \ "registrationDate").asOpt[LocalDateTime],
         idUser = (json \ "idUser").as[Long],
-        itemStatus = (json \ "itemStatus").as[ItemStatus])
+        itemStatus = (json \ "itemStatus").asOpt[ItemStatus])
     )
 
     override def writes(item: Item): JsValue = Json.obj(

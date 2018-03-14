@@ -24,7 +24,7 @@ class ItemRepositoryImpl @Inject()(dbapi: DBApi)(implicit val ec: ExecutionConte
     SQL"""INSERT INTO items (name, description, id_user) VALUES(
           ${element.name},
           ${element.description},
-          ${element.idUser}})""")
+          ${element.idUser})""")
 
   override def delete(id: Long): Future[Option[Int]] = Future.successful(None)
 
