@@ -5,14 +5,17 @@ POST        /authentication             controllers.AuthenticationController.aut
 GET         /api/users                  controllers.UserController.selectAll
 GET         /api/users/:id              controllers.UserController.select(id: Long)
 POST        /api/users                  controllers.UserController.insert
-DELETE      /api/users/:id              controllers.UserController.delete(id: Long)
 PUT         /api/users/:id              controllers.UserController.update(id: Long)
 
 # Item
 GET         /api/items                  controllers.ItemController.selectAll
 GET         /api/items/:id              controllers.ItemController.select(id: Long)
 POST        /api/items                  controllers.ItemController.insert
-DELETE      /api/items/:id              controllers.ItemController.delete(id: Long)
 PUT         /api/items/:id              controllers.ItemController.update(id: Long)
 
 PUT         /api/items/:id/:idStatus    controllers.ItemController.updateStatus(id: Long, idStatus: Int)
+
+#Bid
+GET         /api/bids                   controllers.BidController.selectAll
+GET         /api/bids/:id               controllers.BidController.select(id: Long)
+POST        /api/bids                   controllers.BidController.insert
