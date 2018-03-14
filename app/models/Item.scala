@@ -11,8 +11,8 @@ case class Item(
                  id: Option[Long],
                  name: String,
                  description: Option[String],
-                 idUser: Long,
                  registrationDate: Option[LocalDateTime],
+                 idUser: Long,
                  itemStatus: ItemStatus)
 
 object Item {
@@ -21,11 +21,11 @@ object Item {
     get[Option[Long]]("items.id_item") ~
       get[String]("items.name") ~
       get[Option[String]]("items.description") ~
-      get[Long]("items.id_user") ~
       get[Option[LocalDateTime]]("items.registration_date") ~
+      get[Long]("items.id_user") ~
       get[Int]("items.id_item_status") map {
-      case id ~ name ~ description ~ user ~ registrationDate ~ idItemStatus =>
-        Item(id, name, description, user, registrationDate, ItemStatus(idItemStatus))
+      case id ~ name ~ description ~ registrationDate ~ user ~ idItemStatus =>
+        Item(id, name, description, registrationDate, user, ItemStatus(idItemStatus))
     }
   }
 
@@ -35,8 +35,8 @@ object Item {
         id = (json \ "id").asOpt[Long],
         name = (json \ "name").as[String],
         description = (json \ "description").asOpt[String],
-        idUser = (json \ "idUser").as[Long],
         registrationDate = (json \ "registrationDate").asOpt[LocalDateTime],
+        idUser = (json \ "idUser").as[Long],
         itemStatus = (json \ "itemStatus").as[ItemStatus])
     )
 
@@ -44,8 +44,8 @@ object Item {
       "id" -> item.id,
       "name" -> item.name,
       "description" -> item.description,
-      "idUser" -> item.idUser,
       "registrationDate" -> item.registrationDate,
+      "idUser" -> item.idUser,
       "itemStatus" -> item.itemStatus
     )
   }

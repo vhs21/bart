@@ -9,28 +9,28 @@ import repositories.ItemRepository
 import scala.concurrent.{ExecutionContext, Future}
 
 class ItemRepositoryImpl @Inject()(dbapi: DBApi)(implicit val ec: ExecutionContext)
-  extends ModelRepository[Item](dbapi) with ItemRepository {
+  extends ModelRepository[Item](dbapi, Item.parser) with ItemRepository {
 
   override def selectAll: Future[Seq[Item]] = selectAll(
-    SQL"""SELECT items.id_item, items.name, items.description, items.id_user, items.registration_date, items.id_item_status
-          FROM items""", Item.parser)
+    SQL"""SELECT items.id_item, items.name, items.description, items.registration_date, items.id_user, items.id_item_status
+          FROM items""")
 
-  override def select(id: Long): Future[Option[Item]] = select(id,
-    SQL"""SELECT items.id_item, items.name, items.description, items.id_user, items.registration_date, items.id_item_status
+  override def select(id: Long): Future[Option[Item]] = select(
+    SQL"""SELECT items.id_item, items.name, items.description, items.registration_date, items.id_user, items.id_item_status
           FROM items
-          WHERE items.id_item = $id""", Item.parser)
+          WHERE items.id_item = $id""")
 
-  override def insert(element: Item): Future[Option[Long]] = insert(element,
+  override def insert(element: Item): Future[Option[Long]] = insert(
     SQL"""INSERT INTO items (name, description, id_user) VALUES(
           ${element.name},
           ${element.description},
           ${element.idUser}})""")
 
-  override def delete(id: Long): Future[Int] = delete(id,
+  override def delete(id: Long): Future[Int] = delete(
     SQL"""DELETE FROM items
           WHERE item_id = $id""")
 
-  override def update(id: Long, element: Item): Future[Int] = update(id, element,
+  override def update(id: Long, element: Item): Future[Int] = update(
     SQL"""UPDATE items
           SET name = ${element.name},
               description = ${element.description}
