@@ -38,18 +38,18 @@ class UserController @Inject()(
   }
 
   def delete(id: Long): Action[AnyContent] = authenticatedAction(Role.ADMIN).async { implicit request =>
-    userRepository.delete(id) map { deleted =>
-      if (deleted > 0) Ok
-      else NotFound
+    userRepository.delete(id) map {
+      case Some(deleted) => if (deleted > 0) Ok else NotFound
+      case None => BadRequest
     }
   }
 
   def update(id: Long): Action[JsValue] = authenticatedAction.async(parse.json) { implicit request =>
     request.body.validate[User].fold(
       invalid => Future.successful(BadRequest),
-      user => userRepository.update(id, user) map { updated =>
-        if (updated > 0) Ok
-        else NotFound
+      user => userRepository.update(id, user) map {
+        case Some(updated) => if (updated > 0) Ok else NotFound
+        case None => BadRequest
       }
     )
   }

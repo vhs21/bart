@@ -30,12 +30,9 @@ class UserRepositoryImpl @Inject()(dbapi: DBApi)(implicit val ec: ExecutionConte
           ${BCrypt.hashpw(element.password.get, BCrypt.gensalt())},
           ${element.role.getOrElse(Role.USER).id})""")
 
-  override def delete(id: Long): Future[Int] = delete(
-    SQL"""DELETE
-          FROM users
-          WHERE id_user = $id""")
+  override def delete(id: Long): Future[Option[Int]] = Future.successful(None)
 
-  override def update(id: Long, element: User): Future[Int] = update(
+  override def update(id: Long, element: User): Future[Option[Int]] = update(
     SQL"""UPDATE users
           SET username = ${element.username},
               email = ${element.email}

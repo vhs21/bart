@@ -10,8 +10,8 @@ trait Repository[A] {
 
   def insert(element: A): Future[Option[Long]]
 
-  def delete(id: Long): Future[Int]
+  def delete(id: Long): Future[Option[Int]]
 
-  def update(id: Long, element: A): Future[Int]
+  def update(id: Long, element: A): Future[Option[Int]]
 
 }

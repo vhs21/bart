@@ -26,11 +26,9 @@ class ItemRepositoryImpl @Inject()(dbapi: DBApi)(implicit val ec: ExecutionConte
           ${element.description},
           ${element.idUser}})""")
 
-  override def delete(id: Long): Future[Int] = delete(
-    SQL"""DELETE FROM items
-          WHERE item_id = $id""")
+  override def delete(id: Long): Future[Option[Int]] = Future.successful(None)
 
-  override def update(id: Long, element: Item): Future[Int] = update(
+  override def update(id: Long, element: Item): Future[Option[Int]] = update(
     SQL"""UPDATE items
           SET name = ${element.name},
               description = ${element.description}

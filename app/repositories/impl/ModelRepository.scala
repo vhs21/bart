@@ -22,12 +22,12 @@ abstract class ModelRepository[A](val dbapi: DBApi, val parser: RowParser[A])(im
     db.withConnection { implicit connection => query.executeInsert() }
   }
 
-  def delete(query: SimpleSql[Row]): Future[Int] = Future {
-    db.withConnection { implicit connection => query.executeUpdate() }
+  def delete(query: SimpleSql[Row]): Future[Option[Int]] = Future {
+    db.withConnection { implicit connection => Option(query.executeUpdate()) }
   }
 
-  def update(query: SimpleSql[Row]): Future[Int] = Future {
-    db.withConnection { implicit connection => query.executeUpdate() }
+  def update(query: SimpleSql[Row]): Future[Option[Int]] = Future {
+    db.withConnection { implicit connection => Option(query.executeUpdate()) }
   }
 
 }

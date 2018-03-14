@@ -36,19 +36,19 @@ class ItemController @Inject()(
     )
   }
 
-  def delete(id: Long): Action[AnyContent] = authenticatedAction.async { implicit request =>
-    itemRepository.delete(id) map { deleted =>
-      if (deleted > 0) Ok
-      else NotFound
+  def delete(id: Long): Action[AnyContent] = authenticatedAction(Role.USER).async { implicit request =>
+    itemRepository.delete(id) map {
+      case Some(deleted) => if (deleted > 0) Ok else NotFound
+      case None => BadRequest
     }
   }
 
   def update(id: Long): Action[JsValue] = authenticatedAction.async(parse.json) { implicit request =>
     request.body.validate[Item].fold(
       invalid => Future.successful(BadRequest),
-      item => itemRepository.update(id, item) map { updated =>
-        if (updated > 0) Ok
-        else NotFound
+      item => itemRepository.update(id, item) map {
+        case Some(updated) => if (updated > 0) Ok else NotFound
+        case None => BadRequest
       }
     )
   }
