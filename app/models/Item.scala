@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 import anorm.SqlParser.get
 import anorm.{RowParser, ~}
 import models.ItemStatus.ItemStatus
+import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
 case class Item(
@@ -12,7 +13,7 @@ case class Item(
                  name: String,
                  description: Option[String],
                  registrationDate: Option[LocalDateTime],
-                 idUser: Long,
+                 idUser: Option[Long],
                  itemStatus: Option[ItemStatus])
 
 object Item {
@@ -22,7 +23,7 @@ object Item {
       get[String]("items.name") ~
       get[Option[String]]("items.description") ~
       get[Option[LocalDateTime]]("items.registration_date") ~
-      get[Long]("items.id_user") ~
+      get[Option[Long]]("items.id_user") ~
       get[Int]("items.id_item_status") map {
       case id ~ name ~ description ~ registrationDate ~ user ~ idItemStatus =>
         Item(id, name, description, registrationDate, user, Option(ItemStatus(idItemStatus)))
@@ -30,15 +31,15 @@ object Item {
   }
 
   implicit object ItemFormat extends Format[Item] {
-    override def reads(json: JsValue): JsResult[Item] = JsSuccess(
-      Item(
-        id = (json \ "id").asOpt[Long],
-        name = (json \ "name").as[String],
-        description = (json \ "description").asOpt[String],
-        registrationDate = (json \ "registrationDate").asOpt[LocalDateTime],
-        idUser = (json \ "idUser").as[Long],
-        itemStatus = (json \ "itemStatus").asOpt[ItemStatus])
-    )
+    override def reads(json: JsValue): JsResult[Item] =
+      ((JsPath \ "id").readNullable[Long]
+        and (JsPath \ "name").read[String]
+        and (JsPath \ "description").readNullable[String]
+        and (JsPath \ "registrationDate").readNullable[LocalDateTime]
+        and (JsPath \ "idUser").readNullable[Long]
+        and (JsPath \ "itemStatus").readNullable[ItemStatus]) (Item.apply _)
+        .reads(json)
+
 
     override def writes(item: Item): JsValue = Json.obj(
       "id" -> item.id,

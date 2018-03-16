@@ -11,13 +11,13 @@ object ItemStatus extends Enumeration {
   val REJECTED: Value = Value(3)
 
   implicit object ItemStatusFormat extends Format[ItemStatus] {
+    override def reads(json: JsValue): JsResult[ItemStatus] =
+      (JsPath \ "id").read[Int].map(ItemStatus.apply).reads(json)
+
     override def writes(itemStatus: ItemStatus): JsValue = Json.obj(
       "id" -> itemStatus.id,
       "name" -> itemStatus.toString
     )
-
-    override def reads(json: JsValue): JsResult[ItemStatus] =
-      JsSuccess(ItemStatus((json \ "id").as[Int]))
   }
 
 }

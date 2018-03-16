@@ -11,13 +11,13 @@ object Role extends Enumeration {
   val MANAGER: Value = Value(3)
 
   implicit object RoleFormat extends Format[Role] {
+    override def reads(json: JsValue): JsResult[Role] =
+      (JsPath \ "id").read[Int].map(Role.apply).reads(json)
+
     override def writes(role: Role): JsValue = Json.obj(
       "id" -> role.id,
       "name" -> role.toString
     )
-
-    override def reads(json: JsValue): JsResult[Role] =
-      JsSuccess(Role((json \ "id").as[Int]))
   }
 
 }

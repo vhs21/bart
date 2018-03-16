@@ -2,13 +2,14 @@ package models
 
 import anorm.SqlParser.get
 import anorm.{RowParser, ~}
+import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
 case class Bid(
                 id: Option[Long],
                 idGoalItem: Long,
                 idOfferItem: Long,
-                isAccepted: Boolean)
+                isAccepted: Boolean = false)
 
 object Bid {
 
@@ -23,20 +24,18 @@ object Bid {
   }
 
   implicit object BidFormat extends Format[Bid] {
+    override def reads(json: JsValue): JsResult[Bid] =
+      ((JsPath \ "id").readNullable[Long]
+        and (JsPath \ "idGoalItem").read[Long]
+        and (JsPath \ "idOfferItem").read[Long]
+        and (JsPath \ "isAccepted").read[Boolean]) (Bid.apply _)
+        .reads(json)
+
     override def writes(bid: Bid): JsValue = Json.obj(
       "id" -> bid.id,
       "idGoalItem" -> bid.idGoalItem,
       "idOfferItem" -> bid.idOfferItem,
       "isAccepted" -> bid.isAccepted
-    )
-
-    override def reads(json: JsValue): JsResult[Bid] = JsSuccess(
-      Bid(
-        id = (json \ "id").asOpt[Long],
-        idGoalItem = (json \ "idGoalItem").as[Long],
-        idOfferItem = (json \ "idOfferItem").as[Long],
-        isAccepted = (json \ "isAccepted").asOpt[Boolean].getOrElse(false)
-      )
     )
   }
 
