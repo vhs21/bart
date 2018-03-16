@@ -9,12 +9,12 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
 case class Item(
-                 id: Option[Long],
+                 id: Option[Long] = None,
                  name: String,
-                 description: Option[String],
-                 registrationDate: Option[LocalDateTime],
-                 idUser: Option[Long],
-                 itemStatus: Option[ItemStatus])
+                 description: Option[String] = None,
+                 registrationDate: Option[LocalDateTime] = None,
+                 idUser: Option[Long] = None,
+                 itemStatus: Option[ItemStatus] = None)
 
 object Item {
 
@@ -39,7 +39,6 @@ object Item {
         and (JsPath \ "idUser").readNullable[Long]
         and (JsPath \ "itemStatus").readNullable[ItemStatus]) (Item.apply _)
         .reads(json)
-
 
     override def writes(item: Item): JsValue = Json.obj(
       "id" -> item.id,

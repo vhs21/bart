@@ -7,7 +7,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 import repositories.ItemRepository
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class ItemController @Inject()(
                                 val itemRepository: ItemRepository,
@@ -25,7 +25,13 @@ class ItemController @Inject()(
   }
 
   def insert: Action[JsValue] = authenticatedAction(parse.json).async { implicit request =>
-    insert(request.body.validate[Item])
+    request.body.validate[Item].fold(
+      invalid => Future.successful(BadRequest),
+      item => itemRepository.insert(Item(
+        name = item.name,
+        description = item.description,
+        idUser = request.user.id)).map(_ => Ok)
+    )
   }
 
   def update(id: Long): Action[JsValue] = authenticatedAction.async(parse.json) { implicit request =>

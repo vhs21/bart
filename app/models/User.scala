@@ -35,7 +35,6 @@ object User {
         and (JsPath \ "role").readNullable[Role]) (User.apply _)
         .reads(json)
 
-
     override def writes(user: User): JsValue = Json.obj(
       "id" -> user.id,
       "username" -> user.username,
