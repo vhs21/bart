@@ -33,8 +33,7 @@ class ItemController @Inject()(
       request.body.dataParts.get("item") match {
         case Some(itemParts) => Json.parse(itemParts.mkString).validate[Item].fold(
           invalid => Future.successful(BadRequest),
-          item => itemRepository.insert(
-            Item(
+          item => itemRepository.insert(Item(
               name = item.name,
               description = item.description,
               idUser = request.user.id)) map {

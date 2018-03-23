@@ -33,7 +33,7 @@ class PhotoManager @Inject()(private val configuration: Configuration) {
         .encodeToString(
           Files.readAllBytes(Paths.get(photoUploadDir, filename))))
     } catch {
-      case e: IOException => None
+      case _: IOException => None
     }
   }
 

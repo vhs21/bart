@@ -3,8 +3,8 @@ package controllers
 import auth.{JwtAuthenticator, NonAuthenticatedAction}
 import com.google.inject.Inject
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Json, Reads}
-import play.api.mvc.{AbstractController, ControllerComponents}
+import play.api.libs.json.{JsPath, JsValue, Json, Reads}
+import play.api.mvc.{AbstractController, Action, ControllerComponents}
 import repositories.UserRepository
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -23,7 +23,7 @@ class AuthenticationController @Inject()(
     ((JsPath \ "username").read[String] and
       (JsPath \ "password").read[String]) (AuthForm.apply _)
 
-  def authenticate = nonAuthenticatedAction(parse.json).async { implicit request =>
+  def authenticate: Action[JsValue] = nonAuthenticatedAction(parse.json).async { implicit request =>
     request.body.validate[AuthForm].fold(
       invalid => Future.successful(BadRequest),
       authForm => userRepository.authenticate(authForm.username, authForm.password) map {
