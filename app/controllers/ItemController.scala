@@ -20,8 +20,11 @@ class ItemController @Inject()(
                               (implicit override val ec: ExecutionContext)
   extends ModelController[Item](itemRepository, cc) {
 
-  def selectAll(limit: Int, offset: Int): Action[AnyContent] = Action.async { implicit request =>
-    itemRepository.selectAll(limit, offset) map { items => Ok(Json.toJson(items)) }
+  def selectAll(limit: Int, offset: Int, searchTerm: Option[String]): Action[AnyContent] = Action.async { implicit request =>
+    searchTerm
+      .map(term => itemRepository.searchByNameAndDesc(term, limit, offset))
+      .getOrElse(itemRepository.selectAll(limit, offset))
+      .map { items => Ok(Json.toJson(items)) }
   }
 
   def select(id: Long): Action[AnyContent] = Action.async { implicit request =>

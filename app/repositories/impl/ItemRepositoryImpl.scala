@@ -55,4 +55,15 @@ class ItemRepositoryImpl @Inject()(dbapi: DBApi)(implicit val ec: ExecutionConte
     }
   }
 
+  override def searchByNameAndDesc(searchTerm: String, limit: Int, offset: Int): Future[Seq[Item]] = {
+    val searchTermWithWildcards = s"%$searchTerm%"
+    selectAll(
+      SQL"""SELECT items.id_item, items.name, items.description, items.registration_date, items.id_user, items.id_item_status
+            FROM items
+            WHERE items.name LIKE $searchTermWithWildcards OR items.description LIKE $searchTermWithWildcards
+            ORDER BY items.id_item DESC
+            LIMIT $limit OFFSET $offset"""
+    )
+  }
+
 }

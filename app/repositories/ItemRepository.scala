@@ -15,4 +15,6 @@ trait ItemRepository extends Repository[Item] {
 
   def count: Future[Int]
 
+  def searchByNameAndDesc(searchTerm: String, limit: Int, offset: Int): Future[Seq[Item]]
+
 }

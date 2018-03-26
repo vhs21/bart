@@ -16,7 +16,7 @@ GET         /api/items/:id                          controllers.ItemController.s
 POST        /api/items                              controllers.ItemController.insert
 PUT         /api/items/:id                          controllers.ItemController.update(id: Long)
 
-GET         /api/items                              controllers.ItemController.selectAll(limit: Int, offset: Int ?= 0)
+GET         /api/items                              controllers.ItemController.selectAll(limit: Int, offset: Int ?= 0, searchTerm: Option[String])
 PUT         /api/items/:id/:idStatus                controllers.ItemController.updateStatus(id: Long, idStatus: Int)
 
 
