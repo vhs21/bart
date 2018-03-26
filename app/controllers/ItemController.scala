@@ -20,8 +20,8 @@ class ItemController @Inject()(
                               (implicit override val ec: ExecutionContext)
   extends ModelController[Item](itemRepository, cc) {
 
-  def selectAll: Action[AnyContent] = Action.async { implicit request =>
-    selectAll((items: Seq[Item]) => Json.toJson(items))
+  def selectAll(limit: Int, offset: Int): Action[AnyContent] = Action.async { implicit request =>
+    itemRepository.selectAll(limit, offset) map { items => Ok(Json.toJson(items)) }
   }
 
   def select(id: Long): Action[AnyContent] = Action.async { implicit request =>
@@ -34,9 +34,9 @@ class ItemController @Inject()(
         case Some(itemParts) => Json.parse(itemParts.mkString).validate[Item].fold(
           invalid => Future.successful(BadRequest),
           item => itemRepository.insert(Item(
-              name = item.name,
-              description = item.description,
-              idUser = request.user.id)) map {
+            name = item.name,
+            description = item.description,
+            idUser = request.user.id)) map {
             case Some(idItem) =>
               request.body.files.foreach(file =>
                 photoRepository.insert(photoManager.save(file, idItem)))
@@ -59,5 +59,9 @@ class ItemController @Inject()(
         else NotFound
       }
     }
+
+  def count: Action[AnyContent] = Action.async { implicit request =>
+    itemRepository.count map { count => Ok(Json.toJson(count)) }
+  }
 
 }

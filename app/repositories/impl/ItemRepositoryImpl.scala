@@ -34,11 +34,24 @@ class ItemRepositoryImpl @Inject()(dbapi: DBApi)(implicit val ec: ExecutionConte
               description = ${element.description}
           WHERE id_item = $id""")
 
+  override def selectAll(limit: Int, offset: Int): Future[Seq[Item]] = selectAll(
+    SQL"""SELECT items.id_item, items.name, items.description, items.registration_date, items.id_user, items.id_item_status
+          FROM items
+          ORDER BY items.id_item DESC
+          LIMIT $limit OFFSET $offset""")
+
   override def updateStatus(id: Long, idStatus: Int): Future[Int] = Future {
     db.withConnection { implicit connection =>
       SQL"""UPDATE items
             SET id_item_status = $idStatus
             WHERE id_item = $id""".executeUpdate()
+    }
+  }
+
+  override def count: Future[Int] = Future {
+    db.withConnection { implicit connection =>
+      SQL"""SELECT COUNT(*)
+            FROM items""".as(SqlParser.int(1).single)
     }
   }
 
