@@ -9,10 +9,10 @@ import scala.concurrent.Future
 @ImplementedBy(classOf[ItemRepositoryImpl])
 trait ItemRepository extends Repository[Item] {
 
+  def count(searchTerm: Option[String]): Future[Int]
+
   def selectAll(limit: Int, offset: Int, searchTerm: Option[String]): Future[Seq[Item]]
 
   def updateStatus(id: Long, idStatus: Int): Future[Int]
-
-  def count(searchTerm: Option[String]): Future[Int]
 
 }

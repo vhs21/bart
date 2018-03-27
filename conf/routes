@@ -21,8 +21,7 @@ PUT         /api/items/:id/:idStatus                controllers.ItemController.u
 
 
 #Bid
-GET         /api/bids                               controllers.BidController.selectAll
-GET         /api/bids/:id                           controllers.BidController.select(id: Long)
+GET         /api/items/:idItem/bids                 controllers.BidController.selectAll(idItem: Long)
 POST        /api/bids                               controllers.BidController.insert
 
 

@@ -7,8 +7,8 @@ import play.api.libs.json._
 
 case class Bid(
                 id: Option[Long],
-                idGoalItem: Long,
-                idOfferItem: Long,
+                idItemGoal: Long,
+                idItemOffer: Long,
                 isAccepted: Boolean = false)
 
 object Bid {
@@ -26,15 +26,15 @@ object Bid {
   implicit object BidFormat extends Format[Bid] {
     override def reads(json: JsValue): JsResult[Bid] =
       ((JsPath \ "id").readNullable[Long]
-        and (JsPath \ "idGoalItem").read[Long]
-        and (JsPath \ "idOfferItem").read[Long]
+        and (JsPath \ "idItemGoal").read[Long]
+        and (JsPath \ "idItemOffer").read[Long]
         and (JsPath \ "isAccepted").read[Boolean]) (Bid.apply _)
         .reads(json)
 
     override def writes(bid: Bid): JsValue = Json.obj(
       "id" -> bid.id,
-      "idGoalItem" -> bid.idGoalItem,
-      "idOfferItem" -> bid.idOfferItem,
+      "idItemGoal" -> bid.idItemGoal,
+      "idItemOffer" -> bid.idItemOffer,
       "isAccepted" -> bid.isAccepted
     )
   }

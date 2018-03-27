@@ -21,8 +21,7 @@ class ItemController @Inject()(
   extends ModelController[Item](itemRepository, cc) {
 
   def selectAll(limit: Int, offset: Int, searchTerm: Option[String]): Action[AnyContent] = Action.async { implicit request =>
-    itemRepository.selectAll(limit, offset, searchTerm)
-      .map { items => Ok(Json.toJson(items)) }
+    itemRepository.selectAll(limit, offset, searchTerm) map { items => Ok(Json.toJson(items)) }
   }
 
   def select(id: Long): Action[AnyContent] = Action.async { implicit request =>
@@ -62,8 +61,7 @@ class ItemController @Inject()(
     }
 
   def count(searchTerm: Option[String]): Action[AnyContent] = Action.async { implicit request =>
-    itemRepository.count(searchTerm)
-      .map { count => Ok(Json.toJson(count)) }
+    itemRepository.count(searchTerm) map { count => Ok(Json.toJson(count)) }
   }
 
 }

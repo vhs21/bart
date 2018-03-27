@@ -32,6 +32,19 @@ class ItemRepositoryImpl @Inject()(dbapi: DBApi)(implicit val ec: ExecutionConte
               description = ${element.description}
           WHERE id_item = $id""")
 
+  override def count(searchTerm: Option[String]): Future[Int] = Future {
+    db.withConnection { implicit connection =>
+      foldSearch(searchTerm, term =>
+        SQL"""SELECT COUNT(*)
+              FROM items
+              WHERE items.name LIKE $term OR items.description LIKE $term
+              ORDER BY items.id_item DESC""",
+        SQL"""SELECT COUNT(*)
+              FROM items""")
+        .as(SqlParser.int(1).single)
+    }
+  }
+
   override def selectAll(limit: Int, offset: Int, searchTerm: Option[String]): Future[Seq[Item]] = {
     foldSearch(searchTerm, term =>
       selectAll(
@@ -53,19 +66,6 @@ class ItemRepositoryImpl @Inject()(dbapi: DBApi)(implicit val ec: ExecutionConte
       SQL"""UPDATE items
             SET id_item_status = $idStatus
             WHERE id_item = $id""".executeUpdate()
-    }
-  }
-
-  override def count(searchTerm: Option[String]): Future[Int] = Future {
-    db.withConnection { implicit connection =>
-      foldSearch(searchTerm, term =>
-        SQL"""SELECT COUNT(*)
-              FROM items
-              WHERE items.name LIKE $term OR items.description LIKE $term
-              ORDER BY items.id_item DESC""",
-        SQL"""SELECT COUNT(*)
-              FROM items""")
-        .as(SqlParser.int(1).single)
     }
   }
 

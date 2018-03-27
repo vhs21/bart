@@ -16,12 +16,8 @@ class BidController @Inject()(
                              (implicit override val ec: ExecutionContext)
   extends ModelController(bidRepository, cc) {
 
-  def selectAll: Action[AnyContent] = authenticatedAction.async { implicit request =>
-    selectAll((bids: Seq[Bid]) => Json.toJson(bids))
-  }
-
-  def select(id: Long): Action[AnyContent] = authenticatedAction.async { implicit request =>
-    select(id, Json.toJson[Bid])
+  def selectAll(idItem: Long): Action[AnyContent] = Action.async { implicit request =>
+    bidRepository.selectAllWhereItem(idItem) map { bids => Ok(Json.toJson(bids)) }
   }
 
   def insert: Action[JsValue] = authenticatedAction.async(parse.json) { implicit request =>

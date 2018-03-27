@@ -25,8 +25,8 @@ object Item {
       get[Option[LocalDateTime]]("items.registration_date") ~
       get[Option[Long]]("items.id_user") ~
       get[Int]("items.id_item_status") map {
-      case id ~ name ~ description ~ registrationDate ~ user ~ idItemStatus =>
-        Item(id, name, description, registrationDate, user, Option(ItemStatus(idItemStatus)))
+      case id ~ name ~ description ~ registrationDate ~ idUser ~ idItemStatus =>
+        Item(id, name, description, registrationDate, idUser, Option(ItemStatus(idItemStatus)))
     }
   }
 
