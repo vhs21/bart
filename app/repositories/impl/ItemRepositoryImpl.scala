@@ -11,9 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ItemRepositoryImpl @Inject()(dbapi: DBApi)(implicit val ec: ExecutionContext)
   extends ModelRepository[Item](dbapi, Item.parser) with ItemRepository {
 
-  override def selectAll: Future[Seq[Item]] = selectAll(
-    SQL"""SELECT items.id_item, items.name, items.description, items.registration_date, items.id_user, items.id_item_status
-          FROM items""")
+  override def selectAll: Future[Seq[Item]] = Future.successful(Seq.empty)
 
   override def select(id: Long): Future[Option[Item]] = select(
     SQL"""SELECT items.id_item, items.name, items.description, items.registration_date, items.id_user, items.id_item_status
@@ -34,11 +32,21 @@ class ItemRepositoryImpl @Inject()(dbapi: DBApi)(implicit val ec: ExecutionConte
               description = ${element.description}
           WHERE id_item = $id""")
 
-  override def selectAll(limit: Int, offset: Int): Future[Seq[Item]] = selectAll(
-    SQL"""SELECT items.id_item, items.name, items.description, items.registration_date, items.id_user, items.id_item_status
-          FROM items
-          ORDER BY items.id_item DESC
-          LIMIT $limit OFFSET $offset""")
+  override def selectAll(limit: Int, offset: Int, searchTerm: Option[String]): Future[Seq[Item]] = {
+    foldSearch(searchTerm, term =>
+      selectAll(
+        SQL"""SELECT items.id_item, items.name, items.description, items.registration_date, items.id_user, items.id_item_status
+              FROM items
+              WHERE items.name LIKE $term OR items.description LIKE $term
+              ORDER BY items.id_item DESC
+              LIMIT $limit OFFSET $offset"""),
+      selectAll(
+        SQL"""SELECT items.id_item, items.name, items.description, items.registration_date, items.id_user, items.id_item_status
+              FROM items
+              ORDER BY items.id_item DESC
+              LIMIT $limit OFFSET $offset""")
+    )
+  }
 
   override def updateStatus(id: Long, idStatus: Int): Future[Int] = Future {
     db.withConnection { implicit connection =>
@@ -48,22 +56,26 @@ class ItemRepositoryImpl @Inject()(dbapi: DBApi)(implicit val ec: ExecutionConte
     }
   }
 
-  override def count: Future[Int] = Future {
+  override def count(searchTerm: Option[String]): Future[Int] = Future {
     db.withConnection { implicit connection =>
-      SQL"""SELECT COUNT(*)
-            FROM items""".as(SqlParser.int(1).single)
+      foldSearch(searchTerm, term =>
+        SQL"""SELECT COUNT(*)
+              FROM items
+              WHERE items.name LIKE $term OR items.description LIKE $term
+              ORDER BY items.id_item DESC""",
+        SQL"""SELECT COUNT(*)
+              FROM items""")
+        .as(SqlParser.int(1).single)
     }
   }
 
-  override def searchByNameAndDesc(searchTerm: String, limit: Int, offset: Int): Future[Seq[Item]] = {
-    val searchTermWithWildcards = s"%$searchTerm%"
-    selectAll(
-      SQL"""SELECT items.id_item, items.name, items.description, items.registration_date, items.id_user, items.id_item_status
-            FROM items
-            WHERE items.name LIKE $searchTermWithWildcards OR items.description LIKE $searchTermWithWildcards
-            ORDER BY items.id_item DESC
-            LIMIT $limit OFFSET $offset"""
-    )
+  private def foldSearch[A](searchTerm: Option[String], withSearch: (String) => A, withoutSearch: A): A = {
+    searchTerm
+      .map(term => {
+        val searchTermWithWildcards = s"%$term%"
+        withSearch(searchTermWithWildcards)
+      })
+      .getOrElse(withoutSearch)
   }
 
 }
