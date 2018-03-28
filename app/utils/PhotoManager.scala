@@ -30,8 +30,7 @@ class PhotoManager @Inject()(private val configuration: Configuration) {
     try {
       Some(Base64.getEncoder
         .withoutPadding()
-        .encodeToString(
-          Files.readAllBytes(Paths.get(photoUploadDir, filename))))
+        .encodeToString(Files.readAllBytes(Paths.get(photoUploadDir, filename))))
     } catch {
       case _: IOException => None
     }

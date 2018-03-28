@@ -5,6 +5,7 @@ import com.google.inject.Inject
 import models.Item
 import play.api.db.DBApi
 import repositories.ItemRepository
+import utils.ItemSearchCriteria
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -32,34 +33,21 @@ class ItemRepositoryImpl @Inject()(dbapi: DBApi)(implicit val ec: ExecutionConte
               description = ${element.description}
           WHERE id_item = $id""")
 
-  override def count(searchTerm: Option[String]): Future[Int] = Future {
+  override def count(itemSearchCriteria: ItemSearchCriteria): Future[Int] = Future {
     db.withConnection { implicit connection =>
-      foldSearch(searchTerm, term =>
-        SQL"""SELECT COUNT(*)
-              FROM items
-              WHERE items.name LIKE $term OR items.description LIKE $term
-              ORDER BY items.id_item DESC""",
-        SQL"""SELECT COUNT(*)
-              FROM items""")
+      SQL("SELECT COUNT(*) FROM items" + itemSearchCriteria.whereClause)
+        .on(itemSearchCriteria.namedWhereParamsList: _*)
         .as(SqlParser.int(1).single)
     }
   }
 
-  override def selectAll(limit: Int, offset: Int, searchTerm: Option[String]): Future[Seq[Item]] = {
-    foldSearch(searchTerm, term =>
-      selectAll(
-        SQL"""SELECT items.id_item, items.name, items.description, items.registration_date, items.id_user, items.id_item_status
-              FROM items
-              WHERE items.name LIKE $term OR items.description LIKE $term
-              ORDER BY items.id_item DESC
-              LIMIT $limit OFFSET $offset"""),
-      selectAll(
-        SQL"""SELECT items.id_item, items.name, items.description, items.registration_date, items.id_user, items.id_item_status
-              FROM items
-              ORDER BY items.id_item DESC
-              LIMIT $limit OFFSET $offset""")
-    )
-  }
+  override def selectAll(itemSearchCriteria: ItemSearchCriteria): Future[Seq[Item]] = selectAll(
+    SQL(
+      """SELECT items.id_item, items.name, items.description, items.registration_date, items.id_user, items.id_item_status
+         FROM items""" + itemSearchCriteria.whereClause + itemSearchCriteria.limitClause)
+      .on(itemSearchCriteria.namedWhereParamsList: _*)
+      .on(itemSearchCriteria.namedLimitParamsList: _*)
+  )
 
   override def updateStatus(id: Long, idStatus: Int): Future[Int] = Future {
     db.withConnection { implicit connection =>
@@ -67,15 +55,6 @@ class ItemRepositoryImpl @Inject()(dbapi: DBApi)(implicit val ec: ExecutionConte
             SET id_item_status = $idStatus
             WHERE id_item = $id""".executeUpdate()
     }
-  }
-
-  private def foldSearch[A](searchTerm: Option[String], withSearch: (String) => A, withoutSearch: A): A = {
-    searchTerm
-      .map(term => {
-        val searchTermWithWildcards = s"%$term%"
-        withSearch(searchTermWithWildcards)
-      })
-      .getOrElse(withoutSearch)
   }
 
 }

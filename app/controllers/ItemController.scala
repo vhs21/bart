@@ -7,7 +7,7 @@ import play.api.libs.Files
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 import repositories.{ItemRepository, PhotoRepository}
-import utils.PhotoManager
+import utils.{ItemSearchCriteria, PhotoManager}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -20,8 +20,9 @@ class ItemController @Inject()(
                               (implicit override val ec: ExecutionContext)
   extends ModelController[Item](itemRepository, cc) {
 
-  def selectAll(limit: Int, offset: Int, searchTerm: Option[String]): Action[AnyContent] = Action.async { implicit request =>
-    itemRepository.selectAll(limit, offset, searchTerm) map { items => Ok(Json.toJson(items)) }
+  def selectAll(limit: Int, offset: Int, description: Option[String]): Action[AnyContent] = Action.async { implicit request =>
+    itemRepository.selectAll(new ItemSearchCriteria(limit = limit, offset = offset, description = description))
+      .map { items => Ok(Json.toJson(items)) }
   }
 
   def select(id: Long): Action[AnyContent] = Action.async { implicit request =>
@@ -60,8 +61,9 @@ class ItemController @Inject()(
       }
     }
 
-  def count(searchTerm: Option[String]): Action[AnyContent] = Action.async { implicit request =>
-    itemRepository.count(searchTerm) map { count => Ok(Json.toJson(count)) }
+  def count(description: Option[String]): Action[AnyContent] = Action.async { implicit request =>
+    itemRepository.count(new ItemSearchCriteria(description = description))
+      .map { count => Ok(Json.toJson(count)) }
   }
 
 }
