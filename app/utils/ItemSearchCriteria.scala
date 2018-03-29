@@ -5,27 +5,16 @@ import java.time.LocalDateTime
 import anorm.NamedParameter
 import models.ItemStatus.ItemStatus
 
-class ItemSearchCriteria(
-                          limit: Long = 0,
-                          offset: Long = 0,
-                          id: Option[Long] = None,
-                          description: Option[String] = None,
-                          registrationDate: Option[LocalDateTime] = None,
-                          idUser: Option[Long] = None,
-                          itemStatus: Option[ItemStatus] = None) {
+final class ItemSearchCriteria(
+                                override val limit: Long = 0,
+                                override val offset: Long = 0,
+                                val id: Option[Long] = None,
+                                val description: Option[String] = None,
+                                val registrationDate: Option[LocalDateTime] = None,
+                                val idUser: Option[Long] = None,
+                                val itemStatus: Option[ItemStatus] = None) extends SearchCriteria {
 
-  lazy val whereClause: String =
-    if (whereParams.nonEmpty)
-      whereParams.map(_._1).mkString(" WHERE ", " AND ", "")
-    else ""
-
-  lazy val limitClause = " LIMIT {limit} OFFSET {offset}"
-
-  def namedWhereParamsList: List[NamedParameter] = whereParams.map(_._2)
-
-  def namedLimitParamsList = List(NamedParameter("limit", limit), NamedParameter("offset", offset))
-
-  private lazy val whereParams = List(
+  override protected val whereParams: Seq[(String, NamedParameter)] = Seq(
     id.map(id => (
       "items.id_item = {id}",
       NamedParameter("id", id)
