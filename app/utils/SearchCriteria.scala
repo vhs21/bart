@@ -8,17 +8,17 @@ abstract class SearchCriteria(
 
   protected val whereParams: Seq[(String, NamedParameter)]
 
-  final def whereClause: String =
-    if (whereParams.nonEmpty)
-      whereParams.map(_._1).mkString(" WHERE ", " AND ", "")
-    else ""
+  final def whereClause: String = if (whereParams.nonEmpty)
+    whereParams.map(_._1).mkString(" WHERE ", " AND ", "")
+  else ""
 
-  final def limitClause: String =
-    " LIMIT {limit} OFFSET {offset}"
+  final def limitClause: String = " LIMIT {limit} OFFSET {offset}"
 
   final def namedWhereParamsList: Seq[NamedParameter] = whereParams.map(_._2)
 
   final def namedLimitParamsList: Seq[NamedParameter] = Seq(
-    NamedParameter("limit", limit), NamedParameter("offset", offset))
+    NamedParameter("limit", limit),
+    NamedParameter("offset", offset)
+  )
 
 }

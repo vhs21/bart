@@ -25,7 +25,7 @@ class JwtAuthenticator @Inject()(private val configuration: Configuration) {
 
   def decodePayload(jwtToken: String): Option[User] =
     jwtToken match {
-      case JsonWebToken(header, claimsSet, signature) => Option(Json.parse(claimsSet.asJsonString).as[User])
+      case JsonWebToken(_, claimsSet, _) => Option(Json.parse(claimsSet.asJsonString).as[User])
       case _ => None
     }
 

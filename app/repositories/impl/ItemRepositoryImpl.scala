@@ -43,8 +43,11 @@ class ItemRepositoryImpl @Inject()(dbapi: DBApi)(implicit val ec: ExecutionConte
 
   override def selectAll(itemSearchCriteria: ItemSearchCriteria): Future[Seq[Item]] = selectAll(
     SQL(
-      """SELECT items.id_item, items.name, items.description, items.registration_date, items.id_user, items.id_item_status
-         FROM items""" + itemSearchCriteria.whereClause + itemSearchCriteria.limitClause)
+      s"""SELECT items.id_item, items.name, items.description, items.registration_date, items.id_user, items.id_item_status
+          FROM items
+          ${itemSearchCriteria.whereClause}
+          ORDER BY items.id_item DESC
+          ${itemSearchCriteria.limitClause}""")
       .on(itemSearchCriteria.namedWhereParamsList: _*)
       .on(itemSearchCriteria.namedLimitParamsList: _*)
   )

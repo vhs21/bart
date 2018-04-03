@@ -10,14 +10,14 @@ import repositories.UserRepository
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthenticationController @Inject()(
-                                         val userRepository: UserRepository,
-                                         val jwtAuthenticator: JwtAuthenticator,
-                                         val nonAuthenticatedAction: NonAuthenticatedAction,
-                                         val cc: ControllerComponents)
-                                       (implicit ec: ExecutionContext)
+                                          val userRepository: UserRepository,
+                                          val jwtAuthenticator: JwtAuthenticator,
+                                          val nonAuthenticatedAction: NonAuthenticatedAction,
+                                          val cc: ControllerComponents)
+                                        (implicit ec: ExecutionContext)
   extends AbstractController(cc) {
 
-  case class AuthForm(username: String, password: String) {}
+  case class AuthForm(username: String, password: String)
 
   implicit val authFormReads: Reads[AuthForm] =
     ((JsPath \ "username").read[String] and
