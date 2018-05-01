@@ -24,7 +24,10 @@ abstract class ModelController[A](
   def insert(jsResult: JsResult[A]): Future[Result] =
     jsResult.fold(
       invalid => Future.successful(BadRequest),
-      element => repository.insert(element) map (_ => Ok)
+      element => repository.insert(element) map {
+        case Some(_) => Ok
+        case None => UnprocessableEntity
+      }
     )
 
   def deleteModel(id: Long): Future[Result] =
@@ -38,7 +41,7 @@ abstract class ModelController[A](
       invalid => Future.successful(BadRequest),
       item => repository.update(id, item) map {
         case Some(updated) => if (updated > 0) Ok else NotFound
-        case None => BadRequest
+        case None => UnprocessableEntity
       }
     )
 

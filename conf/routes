@@ -10,13 +10,13 @@ PUT         /api/users/:id                          controllers.UserController.u
 
 
 # Item
-GET         /api/items/count                        controllers.ItemController.count(description: Option[String])
+GET         /api/items/count                        controllers.ItemController.count(id: Option[Long], description: Option[String], registrationDate: Option[String], idUser: Option[Long], idItemStatus: Option[Int])
 
 GET         /api/items/:id                          controllers.ItemController.select(id: Long)
 POST        /api/items                              controllers.ItemController.insert
 PUT         /api/items/:id                          controllers.ItemController.update(id: Long)
 
-GET         /api/items                              controllers.ItemController.selectAll(limit: Int, offset: Int ?= 0, description: Option[String])
+GET         /api/items                              controllers.ItemController.selectAll(limit: Int, offset: Int ?= 0, id: Option[Long], description: Option[String], registrationDate: Option[String], idUser: Option[Long], idItemStatus: Option[Int])
 PUT         /api/items/:id/:idStatus                controllers.ItemController.updateStatus(id: Long, idStatus: Int)
 
 
