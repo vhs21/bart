@@ -20,7 +20,7 @@ final class ItemSearchCriteria(
       NamedParameter("id", id)
     )),
     description.map(description => (
-      "items.name LIKE {description} OR items.description LIKE {description}",
+      "(items.name LIKE {description} OR items.description LIKE {description})",
       NamedParameter("description", s"%$description%")
     )),
     registrationDate.map(registrationDate => (
