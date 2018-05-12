@@ -62,7 +62,7 @@ class ItemController @Inject()(
     update(id, request.body.validate[Item])
   }
 
-  def updateStatus(id: Long, idStatus: Int): Action[AnyContent] = authenticatedAction(Role.MANAGER, Role.ADMIN)
+  def updateStatus(id: Long, idStatus: Int): Action[AnyContent] = authenticatedAction(Role.ADMIN)
     .async { implicit request =>
       itemRepository.updateStatus(id, idStatus) map { updated =>
         if (updated > 0) Ok

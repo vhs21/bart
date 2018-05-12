@@ -9,6 +9,7 @@ object ItemStatus extends Enumeration {
   val CREATED: Value = Value(1)
   val APPROVED: Value = Value(2)
   val REJECTED: Value = Value(3)
+  val IN_BID: Value = Value(4)
 
   implicit object ItemStatusFormat extends Format[ItemStatus] {
     override def reads(json: JsValue): JsResult[ItemStatus] =

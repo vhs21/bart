@@ -30,6 +30,10 @@ final class ItemSearchCriteria(
     idUser.map(idUser => (
       "items.id_user = {id_user}",
       NamedParameter("id_user", idUser)
+    )),
+    itemStatus.map(itemStatus => (
+      "items.id_item_status = {id_item_status}",
+      NamedParameter("id_item_status", itemStatus.id)
     ))
   ).flatten
 

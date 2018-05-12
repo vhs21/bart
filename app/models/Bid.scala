@@ -28,7 +28,7 @@ object Bid {
       ((JsPath \ "id").readNullable[Long]
         and (JsPath \ "idItemGoal").read[Long]
         and (JsPath \ "idItemOffer").read[Long]
-        and (JsPath \ "isAccepted").read[Boolean]) (Bid.apply _)
+        and (JsPath \ "isAccepted").readNullable[Boolean].map(_.getOrElse(false))) (Bid.apply _)
         .reads(json)
 
     override def writes(bid: Bid): JsValue = Json.obj(
