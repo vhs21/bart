@@ -17,7 +17,7 @@ object ItemStatus extends Enumeration {
 
     override def writes(itemStatus: ItemStatus): JsValue = Json.obj(
       "id" -> itemStatus.id,
-      "name" -> itemStatus.toString
+      "name" -> itemStatus.toString.replaceAll("_", " ")
     )
   }
 
