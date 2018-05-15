@@ -11,4 +11,6 @@ trait BidRepository extends Repository[Bid] {
 
   def selectAllWhereItem(idItem: Long): Future[Seq[Bid]]
 
+  def replaceBid(bid: Bid): Future[Int]
+
 }

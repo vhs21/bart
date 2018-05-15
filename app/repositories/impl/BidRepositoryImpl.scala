@@ -18,8 +18,7 @@ class BidRepositoryImpl @Inject()(dbapi: DBApi)(implicit val ec: ExecutionContex
           FROM bids
           WHERE bids.id_bid = $id""")
 
-  override def insert(element: Bid): Future[Option[Long]] = insert(
-    SQL"""INSERT INTO bids(id_item_goal, id_item_offer) VALUES (${element.idItemGoal}, ${element.idItemOffer})""")
+  override def insert(element: Bid): Future[Option[Long]] = Future.successful(None)
 
   override def delete(id: Long): Future[Option[Int]] = Future.successful(None)
 
@@ -29,5 +28,11 @@ class BidRepositoryImpl @Inject()(dbapi: DBApi)(implicit val ec: ExecutionContex
     SQL"""SELECT bids.id_bid, bids.id_item_goal, bids.id_item_offer, bids.is_accepted
           FROM bids
           WHERE bids.id_item_goal = $idItem""")
+
+  override def replaceBid(bid: Bid): Future[Int] = Future {
+    db.withConnection { implicit connection =>
+      SQL"""CALL replace_bid_if_exist(${bid.idItemGoal}, ${bid.idItemOffer})""".executeUpdate()
+    }
+  }
 
 }

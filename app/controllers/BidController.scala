@@ -7,7 +7,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import repositories.BidRepository
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class BidController @Inject()(
                                val bidRepository: BidRepository,
@@ -21,7 +21,10 @@ class BidController @Inject()(
   }
 
   def insert: Action[JsValue] = authenticatedAction.async(parse.json) { implicit request =>
-    insert(request.body.validate[Bid])
+    request.body.validate[Bid].fold(
+      invalid => Future.successful(BadRequest),
+      bid => bidRepository.replaceBid(bid).map { _ => Ok }
+    )
   }
 
 }
